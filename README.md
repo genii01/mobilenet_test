@@ -4,21 +4,28 @@
 ## 시스템 아키텍처
 ```mermaid
 graph TB
-Client[클라이언트] -->|HTTP 요청| LoadBalancer[로드 밸런서]
-LoadBalancer --> API1[API 서버 1]
-LoadBalancer --> API2[API 서버 2]
+    Client[클라이언트] -->|HTTP 요청| FastAPI[FastAPI 애플리케이션]
+    
+    subgraph Application Container
+        FastAPI --> Router[API Router /api/v1]
+        Router --> UploadEndpoint[이미지 업로드 엔드포인트<br>/predict/upload]
+        Router --> Base64Endpoint[Base64 이미지 엔드포인트<br>/predict/base64]
+        Router --> HealthEndpoint[헬스체크 엔드포인트<br>/health]
+        
+        subgraph Image Classification Service
+            UploadEndpoint --> ImageClassifier[ImageClassifier]
+            Base64Endpoint --> ImageClassifier
+            ImageClassifier --> ModelLoader[모델 로더<br>MobileNet V2]
+            ModelLoader --> ModelWeights[(모델 가중치<br>mobilenet_v2_model.pth)]
+            ModelLoader --> ClassLabels[(ImageNet 클래스<br>imagenet_classes.json)]
+        end
+    end
 
-subgraph Docker Container
-API1 --> FastAPI[FastAPI 애플리케이션]
-FastAPI --> ModelService[MobileNet V2 모델 서비스]
-ModelService --> GPU[GPU 처리]
-
-API2 --> FastAPI2[FastAPI 애플리케이션]
-FastAPI2 --> ModelService2[MobileNet V2 모델 서비스]
-ModelService2 --> GPU
-end
-
-GPU --> ModelStorage[(모델 저장소)]
+    subgraph Hardware
+        ImageClassifier --> DeviceSelector{디바이스 선택}
+        DeviceSelector -->|사용 가능시| GPU[GPU]
+        DeviceSelector -->|미사용시| CPU[CPU]
+    end
 ```
 
 ## 프로젝트 구조
