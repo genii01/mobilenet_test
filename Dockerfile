@@ -1,5 +1,5 @@
-# Python 3.12 이미지를 기반으로 함
-FROM python:3.12-slim
+# Python 3.10 이미지를 기반으로 함
+FROM python:3.10-slim
 
 # 작업 디렉토리 설정
 WORKDIR /app
@@ -24,6 +24,9 @@ RUN poetry install --only main --no-interaction --no-ansi --no-root
 
 # 소스코드 복사
 COPY . .
+
+# Python 출력 버퍼링 비활성화 (실시간 로그 출력)
+ENV PYTHONUNBUFFERED=1
 
 # 포트 설정
 EXPOSE 8000

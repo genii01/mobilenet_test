@@ -7,9 +7,6 @@ services:
       dockerfile: Dockerfile
     ports:
       - "8000:8000"
-    volumes:
-      - ./mobilenet_v2_model.pth:/app/mobilenet_v2_model.pth
-      - ./imagenet_classes.json:/app/imagenet_classes.json
     environment:
       - PYTHONUNBUFFERED=1
     healthcheck:
